@@ -4,9 +4,14 @@ import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
+import { AnalysisResult as AnalysisResultType } from '../types'
 import SeverityBadge from './SeverityBadge'
 
-function formatForClipboard({ explanation, rootCause, fixSteps, severity }) {
+interface AnalysisResultProps {
+  result: AnalysisResultType | null
+}
+
+function formatForClipboard({ explanation, rootCause, fixSteps, severity }: AnalysisResultType): string {
   const steps = fixSteps.map((s, i) => `${i + 1}. ${s}`).join('\n')
   const lines = [
     'Explanation:',
@@ -22,7 +27,7 @@ function formatForClipboard({ explanation, rootCause, fixSteps, severity }) {
   return lines.join('\n')
 }
 
-export default function AnalysisResult({ result }) {
+export default function AnalysisResult({ result }: AnalysisResultProps) {
   const [copied, setCopied] = useState(false)
 
   if (!result) return null
@@ -30,7 +35,7 @@ export default function AnalysisResult({ result }) {
   const { explanation, rootCause, fixSteps, severity } = result
 
   async function handleCopy() {
-    await navigator.clipboard.writeText(formatForClipboard(result))
+    await navigator.clipboard.writeText(formatForClipboard(result!))
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }

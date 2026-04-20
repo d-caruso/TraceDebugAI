@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { ChangeEvent, FormEvent, useMemo, useState } from 'react'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
@@ -12,22 +12,23 @@ import { analyzeError } from './api/analyzeError'
 import AnalysisResult from './components/AnalysisResult'
 import ErrorInput from './components/ErrorInput'
 import { MIN_INPUT_LENGTH } from './constants'
+import { AnalysisResult as AnalysisResultType } from './types'
 
 export default function App() {
-  const [darkMode, setDarkMode] = useState(
+  const [darkMode, setDarkMode] = useState<boolean>(
     () => window.matchMedia('(prefers-color-scheme: dark)').matches
   )
-  const [inputText, setInputText] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [result, setResult] = useState(null)
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [inputText, setInputText] = useState<string>('')
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [result, setResult] = useState<AnalysisResultType | null>(null)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const theme = useMemo(
     () => createTheme({ palette: { mode: darkMode ? 'dark' : 'light' } }),
     [darkMode]
   )
 
-  async function handleSubmit(e) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
 
     if (inputText.trim().length < MIN_INPUT_LENGTH) {
@@ -43,7 +44,7 @@ export default function App() {
       const data = await analyzeError(inputText.trim())
       setResult(data)
     } catch (err) {
-      setErrorMessage(err.message)
+      setErrorMessage((err as Error).message)
     } finally {
       setIsLoading(false)
     }
@@ -59,7 +60,7 @@ export default function App() {
               control={
                 <Switch
                   checked={darkMode}
-                  onChange={(e) => setDarkMode(e.target.checked)}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setDarkMode(e.target.checked)}
                   size="small"
                 />
               }

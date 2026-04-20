@@ -2,9 +2,18 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
+import { ChangeEvent, FormEvent } from 'react'
 import { MIN_INPUT_LENGTH, MAX_INPUT_LENGTH } from '../constants'
 
-export default function ErrorInput({ value, onChange, onSubmit, isLoading, errorMessage }) {
+interface ErrorInputProps {
+  value: string
+  onChange: (e: ChangeEvent<HTMLTextAreaElement>) => void
+  onSubmit: (e: FormEvent<HTMLFormElement>) => void
+  isLoading: boolean
+  errorMessage: string | null
+}
+
+export default function ErrorInput({ value, onChange, onSubmit, isLoading, errorMessage }: ErrorInputProps) {
   return (
     <Box component="form" onSubmit={onSubmit} noValidate>
       <TextField
