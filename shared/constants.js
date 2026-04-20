@@ -1,0 +1,4 @@
+const MIN_INPUT_LENGTH = 10;
+const MAX_INPUT_LENGTH = 8000;
+
+module.exports = { MIN_INPUT_LENGTH, MAX_INPUT_LENGTH };
