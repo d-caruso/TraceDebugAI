@@ -3,14 +3,8 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
-import Chip from '@mui/material/Chip'
 import Typography from '@mui/material/Typography'
-
-const SEVERITY_COLOR = {
-  low: 'success',
-  medium: 'warning',
-  high: 'error',
-}
+import SeverityBadge from './SeverityBadge'
 
 function formatForClipboard({ explanation, rootCause, fixSteps, severity }) {
   const steps = fixSteps.map((s, i) => `${i + 1}. ${s}`).join('\n')
@@ -66,15 +60,7 @@ export default function AnalysisResult({ result }) {
           ))}
         </Box>
 
-        {severity && (
-          <Box sx={{ mt: 2 }}>
-            <Chip
-              label={severity.charAt(0).toUpperCase() + severity.slice(1)}
-              color={SEVERITY_COLOR[severity] ?? 'default'}
-              size="small"
-            />
-          </Box>
-        )}
+        <SeverityBadge severity={severity} />
       </CardContent>
     </Card>
   )
