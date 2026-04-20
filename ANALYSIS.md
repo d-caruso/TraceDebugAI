@@ -230,7 +230,8 @@ frontend/
 12. **TypeScript — frontend** — migrate to `.tsx`, add `tsconfig.json`, prop interfaces
 13. **Backend tests** — Jest + ts-jest + Supertest; unit tests for middleware and service, integration tests for route
 14. **CI workflow** — `.github/workflows/ci.yml`; type-check, test, and build jobs
-15. **CD setup** — platform deployment (Vercel for frontend, Railway/Render for backend), `OPENAI_API_KEY` as platform secret
+15. **Root scripts** — root `package.json` with `dev`, `build`, `test`, `build:check` convenience scripts
+16. **CD setup** — platform deployment (Vercel for frontend, Railway/Render for backend), `OPENAI_API_KEY` as platform secret
 
 ---
 
