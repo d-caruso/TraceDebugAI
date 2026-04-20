@@ -21,7 +21,9 @@ main        ← production releases only
         ├── feat/08-frontend-wiring
         ├── feat/09-copy-button
         ├── feat/10-severity-badge
-        └── feat/11-dark-mode
+        ├── feat/11-dark-mode
+        ├── feat/12-ci
+        └── feat/13-cd
 ```
 
 ---
@@ -173,6 +175,37 @@ Each nice-to-have is its own branch. All branch from `develop` after `feat/08-fr
 
 ---
 
+### Phase 4 — CI/CD
+
+#### `feat/12-ci`
+**Branches from:** `develop` (after `feat/11-dark-mode` is merged — all app code in place)  
+**Merges into:** `develop`  
+**Prerequisite:** `feat/11-dark-mode` merged  
+**Scope:**
+- `.github/workflows/ci.yml` — two parallel jobs:
+  - `backend`: `npm ci` in `backend/`, verify server starts cleanly
+  - `frontend`: `npm ci` in `frontend/`, run `npm run build`
+- Triggers on push to `develop` and `main`
+- No secrets required — OpenAI client is lazy-initialised
+
+**Merge criteria:** Workflow runs green on GitHub Actions for both jobs.
+
+---
+
+#### `feat/13-cd`
+**Branches from:** `develop` (after `feat/12-ci` is merged)  
+**Merges into:** `develop`  
+**Prerequisite:** `feat/12-ci` merged  
+**Scope:**
+- Frontend deployment config for Vercel or Netlify (root: `frontend/`, build: `npm run build`)
+- Backend deployment config for Railway or Render (root: `backend/`, start: `node server.js`)
+- `OPENAI_API_KEY` added as a platform secret — never in the repo
+- Any platform-specific config files (e.g. `vercel.json`, `render.yaml`) if required
+
+**Merge criteria:** Both frontend and backend deploy automatically on push to `main`; live app calls OpenAI successfully.
+
+---
+
 ## Merge Rules
 
 No pull requests. The workflow for each feature branch is:
@@ -250,7 +283,10 @@ develop
 │
 ├─► feat/09-copy-button ────────────────────────────────────────────► merged into develop
 ├─► feat/10-severity-badge ─────────────────────────────────────────► merged into develop
-└─► feat/11-dark-mode ──────────────────────────────────────────────► merged into develop
+├─► feat/11-dark-mode ──────────────────────────────────────────────► merged into develop
+│
+├─► feat/12-ci ─────────────────────────────────────────────────────► merged into develop
+└─► feat/13-cd ─────────────────────────────────────────────────────► merged into develop
 
 develop ────────────────────────────────────────────────────────────► merged into main (release)
 ```

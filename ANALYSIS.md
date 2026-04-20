@@ -20,10 +20,13 @@ Express Server (Node.js)
     └── middleware/validate.js            → input validation (length, type)
 ```
 
-Three directories under one repo:
+Four directories under one repo:
 
 ```
 TraceDebugAI/
+├── .github/
+│   └── workflows/
+│       └── ci.yml     ← build check on every push to develop and main
 ├── shared/
 │   └── constants.js   ← MIN_INPUT_LENGTH = 10, MAX_INPUT_LENGTH = 8000
 ├── backend/
@@ -42,6 +45,7 @@ TraceDebugAI/
 | Styling     | MUI (@mui/material) | Pre-built components (TextField, Button, Card, Chip, Alert) map 1:1 to spec; imported individually by path to minimise bundle size |
 | HTTP client | axios             | Explicit timeout and error handling                   |
 | Env mgmt    | dotenv            | Standard; keeps API key server-side only              |
+| CI/CD       | GitHub Actions    | Native GitHub integration, free for public repos      |
 
 ---
 
@@ -220,6 +224,8 @@ frontend/
 8. **`AnalysisResult` component** — result blocks, severity badge
 9. **`App.jsx`** — state wiring, error display
 10. **End-to-end smoke test** — happy path + each error case
+11. **CI workflow** — `.github/workflows/ci.yml`, backend + frontend build jobs
+12. **CD setup** — platform deployment (Vercel for frontend, Railway/Render for backend), `OPENAI_API_KEY` as platform secret
 
 ---
 
@@ -234,6 +240,32 @@ frontend/
 | 5 | Frontend displays Explanation, Root Cause, Fix Steps   | Manual UI test                                |
 | 6 | Empty, too-short, and too-long inputs are rejected     | Manual UI test + curl with bad payloads       |
 | 7 | API key not present in frontend bundle or network tab  | DevTools Sources + Network inspection         |
+
+---
+
+---
+
+## CI/CD
+
+### CI — `.github/workflows/ci.yml`
+
+Triggers on every push to `develop` and `main`. Two parallel jobs:
+
+| Job | Steps |
+|-----|-------|
+| `backend` | `npm ci` in `backend/`; verify `node server.js` exits cleanly |
+| `frontend` | `npm ci` in `frontend/`; run `npm run build` |
+
+`OPENAI_API_KEY` is not required for CI — the OpenAI client is lazy-initialised and never called during a build.
+
+### CD — Recommended platform targets
+
+| Layer | Platform | How |
+|-------|----------|-----|
+| Frontend | Vercel or Netlify | Connect repo; set root to `frontend/`; build command `npm run build`; auto-deploys on push to `main` |
+| Backend | Railway or Render | Connect repo; set root to `backend/`; start command `node server.js`; add `OPENAI_API_KEY` as a platform secret env var |
+
+`OPENAI_API_KEY` is added in the platform dashboard — never in the repo. No code changes required; `dotenv` falls back to real env vars when `.env` is absent.
 
 ---
 
