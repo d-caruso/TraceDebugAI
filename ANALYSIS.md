@@ -45,6 +45,8 @@ TraceDebugAI/
 | Styling     | MUI (@mui/material) | Pre-built components (TextField, Button, Card, Chip, Alert) map 1:1 to spec; imported individually by path to minimise bundle size |
 | HTTP client | axios             | Explicit timeout and error handling                   |
 | Env mgmt    | dotenv            | Standard; keeps API key server-side only              |
+| Language    | TypeScript        | Full type safety on backend and frontend; matches existing project conventions |
+| Testing     | Jest + ts-jest + Supertest | Unit and integration tests for the backend |
 | CI/CD       | GitHub Actions    | Native GitHub integration, free for public repos      |
 
 ---
@@ -224,8 +226,11 @@ frontend/
 8. **`AnalysisResult` component** — result blocks, severity badge
 9. **`App.jsx`** — state wiring, error display
 10. **End-to-end smoke test** — happy path + each error case
-11. **CI workflow** — `.github/workflows/ci.yml`, backend + frontend build jobs
-12. **CD setup** — platform deployment (Vercel for frontend, Railway/Render for backend), `OPENAI_API_KEY` as platform secret
+11. **TypeScript — backend** — migrate to `.ts`, add `tsconfig.json`, `src/` structure, type annotations
+12. **TypeScript — frontend** — migrate to `.tsx`, add `tsconfig.json`, prop interfaces
+13. **Backend tests** — Jest + ts-jest + Supertest; unit tests for middleware and service, integration tests for route
+14. **CI workflow** — `.github/workflows/ci.yml`; type-check, test, and build jobs
+15. **CD setup** — platform deployment (Vercel for frontend, Railway/Render for backend), `OPENAI_API_KEY` as platform secret
 
 ---
 
@@ -253,8 +258,9 @@ Triggers on every push to `develop` and `main`. Two parallel jobs:
 
 | Job | Steps |
 |-----|-------|
-| `backend` | `npm ci` in `backend/`; verify `node server.js` exits cleanly |
-| `frontend` | `npm ci` in `frontend/`; run `npm run build` |
+| `backend-check` | `npm ci` in `backend/`; `npm run build:check` (TypeScript type check) |
+| `backend-test` | `npm ci` in `backend/`; `npm test` |
+| `frontend-build` | `npm ci` in `frontend/`; `npm run build` |
 
 `OPENAI_API_KEY` is not required for CI — the OpenAI client is lazy-initialised and never called during a build.
 

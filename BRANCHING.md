@@ -22,8 +22,11 @@ main        ← production releases only
         ├── feat/09-copy-button
         ├── feat/10-severity-badge
         ├── feat/11-dark-mode
-        ├── feat/12-ci
-        └── feat/13-cd
+        ├── feat/12-typescript-backend
+        ├── feat/13-typescript-frontend
+        ├── feat/14-backend-tests
+        ├── feat/15-ci
+        └── feat/16-cd
 ```
 
 ---
@@ -175,34 +178,88 @@ Each nice-to-have is its own branch. All branch from `develop` after `feat/08-fr
 
 ---
 
-### Phase 4 — CI/CD
+### Phase 4 — TypeScript Migration
 
-#### `feat/12-ci`
-**Branches from:** `develop` (after `feat/11-dark-mode` is merged — all app code in place)  
+#### `feat/12-typescript-backend`
+**Branches from:** `develop` (after `feat/11-dark-mode` is merged)  
 **Merges into:** `develop`  
 **Prerequisite:** `feat/11-dark-mode` merged  
 **Scope:**
-- `.github/workflows/ci.yml` — two parallel jobs:
-  - `backend`: `npm ci` in `backend/`, verify server starts cleanly
-  - `frontend`: `npm ci` in `frontend/`, run `npm run build`
-- Triggers on push to `develop` and `main`
-- No secrets required — OpenAI client is lazy-initialised
+- `shared/constants.js` → `shared/constants.ts` (named ES exports)
+- All backend files moved to `src/` and renamed `.js` → `.ts`
+- `backend/tsconfig.json` + `backend/tsconfig.build.json`
+- `backend/src/types/index.ts` — `AnalysisResult` interface
+- Type annotations on all middleware, controller, and service functions
+- `package.json` scripts: `dev` (ts-node), `build` (tsc), `build:check` (tsc --noEmit)
+- New dev deps: `typescript`, `ts-node`, `@types/node`, `@types/express`, `@types/cors`
+- `backend/.gitignore` — add `dist/`
 
-**Merge criteria:** Workflow runs green on GitHub Actions for both jobs.
+**Merge criteria:** `npm run build:check` passes with no errors; `npm run dev` starts; `GET /` → 200.
 
 ---
 
-#### `feat/13-cd`
-**Branches from:** `develop` (after `feat/12-ci` is merged)  
+#### `feat/13-typescript-frontend`
+**Branches from:** `develop` (after `feat/12-typescript-backend` is merged)  
 **Merges into:** `develop`  
-**Prerequisite:** `feat/12-ci` merged  
+**Prerequisite:** `feat/12-typescript-backend` merged  
+**Scope:**
+- All frontend files renamed `.jsx` → `.tsx`, `.js` → `.ts` (including `vite.config.ts`)
+- `frontend/tsconfig.json` — strict, noEmit (Vite handles bundling)
+- `frontend/src/types/index.ts` — `AnalysisResult` interface (mirrors backend)
+- Prop interfaces for `ErrorInput`, `AnalysisResult`, `SeverityBadge`
+- New dev deps: `@types/react`, `@types/react-dom`
+
+**Merge criteria:** `npm run build` (Vite) completes with no TypeScript errors; `npm run dev` starts cleanly.
+
+---
+
+### Phase 5 — Tests
+
+#### `feat/14-backend-tests`
+**Branches from:** `develop` (after `feat/13-typescript-frontend` is merged)  
+**Merges into:** `develop`  
+**Prerequisite:** `feat/13-typescript-frontend` merged  
+**Scope:**
+- New dev deps: `jest`, `ts-jest`, `supertest`, `@types/jest`, `@types/supertest`
+- `backend/jest.config.js`
+- `backend/tests/middleware/validate.test.ts` — unit tests (5 cases)
+- `backend/tests/services/aiService.test.ts` — unit tests with mocked OpenAI
+- `backend/tests/routes/analyze.test.ts` — integration tests via Supertest (5 cases)
+- `package.json` — add `"test": "jest"` script
+
+**Merge criteria:** `npm test` runs all suites green with no skipped tests.
+
+---
+
+### Phase 6 — CI/CD
+
+#### `feat/15-ci`
+**Branches from:** `develop` (after `feat/14-backend-tests` is merged)  
+**Merges into:** `develop`  
+**Prerequisite:** `feat/14-backend-tests` merged  
+**Scope:**
+- `.github/workflows/ci.yml` — three parallel jobs:
+  - `backend-check`: `npm ci` + `npm run build:check`
+  - `backend-test`: `npm ci` + `npm test`
+  - `frontend-build`: `npm ci` + `npm run build`
+- Triggers on push to `develop` and `main`
+- No secrets required — tests mock OpenAI
+
+**Merge criteria:** All three jobs pass green on GitHub Actions.
+
+---
+
+#### `feat/16-cd`
+**Branches from:** `develop` (after `feat/15-ci` is merged)  
+**Merges into:** `develop`  
+**Prerequisite:** `feat/15-ci` merged  
 **Scope:**
 - Frontend deployment config for Vercel or Netlify (root: `frontend/`, build: `npm run build`)
-- Backend deployment config for Railway or Render (root: `backend/`, start: `node server.js`)
+- Backend deployment config for Railway or Render (root: `backend/`, start: `node dist/server.js`)
 - `OPENAI_API_KEY` added as a platform secret — never in the repo
 - Any platform-specific config files (e.g. `vercel.json`, `render.yaml`) if required
 
-**Merge criteria:** Both frontend and backend deploy automatically on push to `main`; live app calls OpenAI successfully.
+**Merge criteria:** Push to `main` triggers auto-deploy; live app calls OpenAI successfully.
 
 ---
 
@@ -285,8 +342,12 @@ develop
 ├─► feat/10-severity-badge ─────────────────────────────────────────► merged into develop
 ├─► feat/11-dark-mode ──────────────────────────────────────────────► merged into develop
 │
-├─► feat/12-ci ─────────────────────────────────────────────────────► merged into develop
-└─► feat/13-cd ─────────────────────────────────────────────────────► merged into develop
+├─► feat/12-typescript-backend ─────────────────────────────────────► merged into develop
+├─► feat/13-typescript-frontend ────────────────────────────────────► merged into develop
+├─► feat/14-backend-tests ──────────────────────────────────────────► merged into develop
+│
+├─► feat/15-ci ─────────────────────────────────────────────────────► merged into develop
+└─► feat/16-cd ─────────────────────────────────────────────────────► merged into develop
 
 develop ────────────────────────────────────────────────────────────► merged into main (release)
 ```
