@@ -28,7 +28,7 @@ export class GeminiHandler implements AIHandler {
 
   async analyzeError(errorText: string): Promise<AnalysisResult> {
     const model = this.getClient().getGenerativeModel({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.0-flash',
       systemInstruction: SYSTEM_PROMPT,
       generationConfig: { responseMimeType: 'application/json' },
     });
