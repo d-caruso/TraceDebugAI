@@ -27,7 +27,8 @@ main        ← production releases only
         ├── feat/14-backend-tests
         ├── feat/15-ci
         ├── feat/16-root-scripts
-        └── feat/17-cd
+        ├── feat/17-rate-limiter
+        └── feat/18-cd
 ```
 
 ---
@@ -250,7 +251,18 @@ Each nice-to-have is its own branch. All branch from `develop` after `feat/08-fr
 
 ---
 
-#### `feat/17-cd`
+#### `feat/17-rate-limiter`
+**Branches from:** `develop` (after `feat/16-root-scripts` is merged)  
+**Merges into:** `develop`  
+**Scope:**
+- Install `express-rate-limit` in backend
+- `backend/src/middleware/rateLimit.ts` — per-IP limiter, limit configurable via `RATE_LIMIT_MAX` env var (default 20 req / 15 min window)
+- Apply limiter to `POST /api/analyze-error` before validation middleware
+- `frontend/src/api/analyzeError.ts` — catch 429 and surface user-friendly message
+
+---
+
+#### `feat/18-cd`
 **Branches from:** `develop` (after `feat/15-ci` is merged)  
 **Merges into:** `develop`  
 **Prerequisite:** `feat/15-ci` merged  
@@ -349,7 +361,8 @@ develop
 │
 ├─► feat/15-ci ─────────────────────────────────────────────────────► merged into develop
 ├─► feat/16-root-scripts ───────────────────────────────────────────► merged into develop
-└─► feat/17-cd ─────────────────────────────────────────────────────► merged into develop
+├─► feat/17-rate-limiter ───────────────────────────────────────────► merged into develop
+└─► feat/18-cd ─────────────────────────────────────────────────────► merged into develop
 
 develop ────────────────────────────────────────────────────────────► merged into main (release)
 ```
