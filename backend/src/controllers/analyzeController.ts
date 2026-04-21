@@ -11,6 +11,7 @@ export async function analyze(req: Request, res: Response): Promise<void> {
       res.status(422).json({ message: 'Unable to generate a valid analysis. Please try again.' });
       return;
     }
+    console.error('[analyzeController] unexpected error:', error.message, error.stack);
     res.status(503).json({ message: 'The analysis service is temporarily unavailable.' });
   }
 }
