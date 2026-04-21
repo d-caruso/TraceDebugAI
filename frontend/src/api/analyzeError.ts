@@ -7,10 +7,12 @@ const MESSAGES = {
   rate_limited: 'Too many requests. Please wait a moment and try again.',
 }
 
+const BASE_URL = import.meta.env.VITE_API_URL ?? '';
+
 export async function analyzeError(errorText: string): Promise<AnalysisResult> {
   try {
     const { data } = await axios.post<AnalysisResult>(
-      '/api/analyze-error',
+      `${BASE_URL}/api/analyze-error`,
       { error: errorText },
       { timeout: 20000 }
     )

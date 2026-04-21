@@ -5,7 +5,7 @@ import { AnalysisResult } from '../types';
 let client: OpenAI;
 function getClient(): OpenAI {
   if (!client) {
-    client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY, timeout: 15000 });
+    client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY, timeout: 8000 });
   }
   return client;
 }
