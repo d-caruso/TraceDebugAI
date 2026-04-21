@@ -39,6 +39,11 @@ describe('OpenAIHandler', () => {
     expect(result).toMatchObject(payload);
   });
 
+  it('throws INVALID_INPUT when isError is false', async () => {
+    mockCreate.mockResolvedValueOnce(makeOpenAIResponse(JSON.stringify({ isError: false })));
+    await expect(handler.analyzeError('this is a test')).rejects.toThrow('INVALID_INPUT');
+  });
+
   it('throws MALFORMED_RESPONSE when required fields are missing', async () => {
     const payload = { explanation: 'Something went wrong.' };
     mockCreate.mockResolvedValueOnce(makeOpenAIResponse(JSON.stringify(payload)));

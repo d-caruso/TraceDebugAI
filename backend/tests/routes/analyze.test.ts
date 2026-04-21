@@ -42,6 +42,17 @@ describe('POST /api/analyze-error', () => {
     expect(res.status).toBe(400);
   });
 
+  it('returns 400 when aiService throws INVALID_INPUT', async () => {
+    mockAnalyzeError.mockRejectedValueOnce(new Error('INVALID_INPUT'));
+
+    const res = await request(app)
+      .post('/api/analyze-error')
+      .send({ error: 'Cannot find module express after npm ci' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toMatch(/error or stack trace/i);
+  });
+
   it('returns 422 when aiService throws MALFORMED_RESPONSE', async () => {
     mockAnalyzeError.mockRejectedValueOnce(new Error('MALFORMED_RESPONSE'));
 
