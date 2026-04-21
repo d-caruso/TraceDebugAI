@@ -35,6 +35,11 @@ describe('GeminiHandler', () => {
     expect(result).toMatchObject(payload);
   });
 
+  it('throws INVALID_INPUT when isError is false', async () => {
+    mockGenerateContent.mockResolvedValueOnce(makeGeminiResponse(JSON.stringify({ isError: false })));
+    await expect(handler.analyzeError('this is a test')).rejects.toThrow('INVALID_INPUT');
+  });
+
   it('throws MALFORMED_RESPONSE when required fields are missing', async () => {
     const payload = { explanation: 'Something went wrong.' };
     mockGenerateContent.mockResolvedValueOnce(makeGeminiResponse(JSON.stringify(payload)));
