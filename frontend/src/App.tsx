@@ -75,6 +75,9 @@ export default function App() {
             <Typography variant="subtitle1" color="text.secondary">
               AI powered error &amp; stack trace explainer
             </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Paste an error message or stack trace and get a structured explanation.
+            </Typography>
           </Box>
 
           <Card variant="outlined" sx={{ mb: 3 }}>
