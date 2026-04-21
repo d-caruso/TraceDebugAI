@@ -69,11 +69,11 @@ export default function App() {
           </Box>
 
           <Box sx={{ mb: 4, textAlign: 'center' }}>
-            <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
-              AI Error Explainer
+            <Typography variant="h4" component="h1" fontWeight="bold" color="primary" gutterBottom>
+              TraceDebug AI
             </Typography>
             <Typography variant="subtitle1" color="text.secondary">
-              Paste an error message or stack trace and get a structured explanation.
+              AI powered error &amp; stack trace explainer
             </Typography>
           </Box>
 
